@@ -1,9 +1,12 @@
 Package: kmr
-Title: What the Package Does (one line, title case)
+Title: Kernel multitask regression
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Jean-Philippe", "Vert", email = "djipay@gmail.com", role = c("aut", "cre"))
+Description: The package implements a kernel multitask regression algorithm to solve simultaneously several regression problems.
 Depends: R (>= 3.3.0)
-License: What license is it under?
+License: Artistic-2.0
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/jpvert/kmr
+BugReports: https://github.com/jpvert/kmr/issues
+RoxygenNote: 6.0.1
