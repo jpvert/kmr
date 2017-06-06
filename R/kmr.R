@@ -47,7 +47,7 @@ kmr <- function(x, y, lambda=1, kx_type=c("linear", "gaussian", "precomputed"), 
       Kx = x
     } else {
       # Gaussian kernel
-      Kx = exp(-as.matrix(dist(x))^2/(2*kx_option[['sigma']]^2))
+      Kx = gausskernel(x, kx_option[['sigma']])
     }
     s=eigen(Kx,symmetric=TRUE)
     Ux=s$vectors
@@ -67,8 +67,12 @@ kmr <- function(x, y, lambda=1, kx_type=c("linear", "gaussian", "precomputed"), 
   Dt=s$values
   rm(s)
   
+  # Useful computations
+  gamma = as.matrix(apply(Ux,2,sum))
+  UxZUy = Ux %*% y %*% t(Uy)
+  
   # Return
-  res=list(Ux=Ux,Dx=Dx,Ut=Ut,Dt=Dt,kx_type=kx_type,kx_option=kx_option,call=this.fcall)
+  res=list(x=x,y=y,Ux=Ux,Dx=Dx,Ut=Ut,Dt=Dt,gamma=gamma,UxZUy=UxZUy,kx_type=kx_type,kx_option=kx_option,call=this.fcall)
   class(res)="kmr"
   return(res)
 }
