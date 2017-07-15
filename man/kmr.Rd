@@ -4,7 +4,7 @@
 \alias{kmr}
 \title{Kernel multitask regression}
 \usage{
-kmr(x, y, lambda = 1, kx_type = c("linear", "gaussian", "precomputed"),
+kmr(x, y, kx_type = c("linear", "gaussian", "precomputed"),
   kx_option = list(sigma = 1), kt_type = c("multitask", "empirical",
   "precomputed"), kt_option = list(alpha = 1))
 }
@@ -36,6 +36,16 @@ as kernel between the tasks. \code{kt_type="precomputed"} allows to provide
 a precomputed kernel as a field \code{kt} in the \code{kt_type} list.}
 
 \item{kt_option}{An optional list of parameters for the task kernel.}
+
+\item{lambda}{If cross-validation is performed, a vector of values of lambda that must be tested}
+
+\item{nfolds}{Number of folds for cross-validation. If \code{nfolds=1}
+(default), then no cross-validation is done, except if \code{foldid} is
+provided.}
+
+\item{foldid}{An optional vector of values between 1 and \code{nfold}
+identifying what fold each observation is in. If supplied, \code{nfold} can
+be missing.}
 }
 \value{
 An object of class \code{"kmr"}, which can then be used to make 

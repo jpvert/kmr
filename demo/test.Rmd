@@ -1,0 +1,27 @@
+---
+title: "test"
+author: "Jean-Philippe Vert"
+date: "13 juillet 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+set.seed(1234)
+load("../../../MinesSVN/gcsi/results/150820/GCSIdata.Rdata")
+# We restrict the analysis to the cell lines with all drugs measured and enough features; we then only keep features measured in all cell lines.
+mycell <- which((apply(gcsi.mv,1,function(u){sum(is.na(u))}) == 0) & (apply(celllinefeatures,1,function(u){sum(is.na(u))}) < 1000))
+y <- gcsi.mv[mycell,]
+x <- celllinefeatures[mycell,]
+x <- x[,apply(x,2,function(u){sum(is.na(u))})==0]
+x <- scale(x)
+x <- x[,apply(x,2,function(u){sum(is.na(u))})==0]
+cat('We work with',dim(x)[1],'cell lines and',dim(x)[2],'descriptors')
+
+m = kmr(x,y)
+ypred = predict(m,x,10^(-5:5))
+```
