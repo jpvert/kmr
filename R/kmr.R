@@ -8,7 +8,7 @@
 #' @param y Output matrix of responses. \code{y} should be an \code{nobs x 
 #'   ntasks} matrix, where each row corresponds to an observation and each 
 #'   column to a task.
-#' @param kx_type Kernel for observations.  \code{kx_type="linear"} is the
+#' @param kx_type Kernel for observations. \code{kx_type="linear"} is the
 #'   linear kernel (default). \code{kx_type="gaussian"} is the Gaussian RBF
 #'   kernel with bandwidth \code{sigma=1} by default, or any other valued is
 #'   passed as an element of the \code{kx_option} list.
@@ -23,8 +23,8 @@
 #'   \code{kt_type="empirical"} takes the empirical correlation between outputs 
 #'   as kernel between the tasks. \code{kt_type="precomputed"} allows to provide
 #'   a precomputed kernel as a field \code{kt} in the \code{kt_type} list.
-#' @param kt_option An optional list of parameters for the task kernel.
-#' @param lambda If cross-validation is performed, a vector of values of lambda that must be tested
+#' @param kt_option. An optional list of parameters for the task kernel.
+#' @param lambda. If cross-validation is performed, a vector of values of lambda that must be tested
 #' @param nfolds Number of folds for cross-validation. If \code{nfolds=1}
 #'   (default), then no cross-validation is done, except if \code{foldid} is
 #'   provided.
