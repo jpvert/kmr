@@ -1,4 +1,4 @@
-#' Make prediction with a kmr object
+#' Make prediction with a "\code{kmr}" object
 #' 
 #' Similar to other \code{predict} methods, this function predicts fitted values
 #' from a fitted "\code{kmr}" object
@@ -14,7 +14,7 @@
 #'   list of matrices, corresponding to the predictions for the different values
 #'   of \code{lambda} in the list.
 #' @export
-predict.kmr <- function(object, newx, lambda=1) {
+predict.kmr <- function(object, newx, lambda = 1) {
   
   # Kernel matrix between test and train sets
   K = switch(object$kx_type,

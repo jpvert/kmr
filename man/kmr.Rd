@@ -17,7 +17,7 @@ row is an observation vector. If a precomputed kernel is used, then
 ntasks} matrix, where each row corresponds to an observation and each 
 column to a task.}
 
-\item{kx_type}{Kernel for observations.  \code{kx_type="linear"} is the
+\item{kx_type}{Kernel for observations. \code{kx_type="linear"} is the
 linear kernel (default). \code{kx_type="gaussian"} is the Gaussian RBF
 kernel with bandwidth \code{sigma=1} by default, or any other valued is
 passed as an element of the \code{kx_option} list.
@@ -35,9 +35,9 @@ to the \code{kt_option} list as a field \code{alpha}.
 as kernel between the tasks. \code{kt_type="precomputed"} allows to provide
 a precomputed kernel as a field \code{kt} in the \code{kt_type} list.}
 
-\item{kt_option}{An optional list of parameters for the task kernel.}
+\item{kt_option.}{An optional list of parameters for the task kernel.}
 
-\item{lambda}{If cross-validation is performed, a vector of values of lambda that must be tested}
+\item{lambda.}{If cross-validation is performed, a vector of values of lambda that must be tested}
 
 \item{nfolds}{Number of folds for cross-validation. If \code{nfolds=1}
 (default), then no cross-validation is done, except if \code{foldid} is

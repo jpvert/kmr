@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict.kmr.R
 \name{predict.kmr}
 \alias{predict.kmr}
-\title{Make prediction with a kmr object}
+\title{Make prediction with a "\code{kmr}" object}
 \usage{
 \method{predict}{kmr}(object, newx, lambda = 1)
 }

@@ -9,14 +9,19 @@
 #' @param kt_type Kernel type for tasks as in \code{kmr}
 #' @param kt_option Optional list of parameters for the task kernel as in \code{kmr}
 #' @param lambda Sequence of values for lambda that must be tested. Default is 10^(-5:5)
-#' @param type.measure Loss to use for cross-validation. The default is \code{type.measure="mse"} the mean squared error. \code{type.measure="ci"} measures the concordance index.
+#' @param type.measure Loss to use for cross-validation. The default is \code{type.measure="ci"} the concordance index. Other options are \code{type.measure="mse"} the mean squared error.
 #' @param nfolds Number of folds for cross-validation. Default is 5.
 #' @param nrepeats Number of times the k-fold cross-validation is performed Default is 10.
 #' @param seed A seed number for the random number generator (useful to have the same CV splits)
+#' @return An object of class \code{"cv.kmr"}, which can then be used to make predictions for the different tasks on new observations as being a list containing the following useful slots:
+#' \item{meanCV}{A matrix of CV performance scores of dim ntask x nlambda.}
+#' \item{bestlambda}{A vector of lambdas of length ntask, each corresp to the underlying min CV score.}
+#' \item{lambda}{Lambda grid to tune over.}
+#' \item{type.measure}{Measure type.}
 #' @export
 #' 
 #' 
-cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=list(sigma=1), kt_type=c("multitask", "empirical", "precomputed"), kt_option=list(alpha=1), lambda=10^(1:10), type.measure = c("mse","ci"), nfolds=5, nrepeats=10, seed=9182456) {
+cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=list(sigma=1), kt_type=c("multitask", "empirical", "precomputed"), kt_option=list(alpha=1), lambda=10^(-5:5), type.measure = c("ci","mse"), nfolds=5, nrepeats=1, seed=9182456, mc.cores=1) {
   
   kx_type=match.arg(kx_type)
   kt_type=match.arg(kt_type)
@@ -24,6 +29,7 @@ cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_opti
   N = nrow(x)
   Nt = ncol(y)
   Nl = length(lambda)
+  stopifnot(Nl > 1)
   
   # Set random number generator seed
   set.seed(seed)
@@ -37,7 +43,7 @@ cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_opti
   
   ### Iterate over the folds
   resCV <- mclapply(seq(nexp) , function(iexp) {
-    cat('.')
+    message('.', appendLF = F)
     
     # training samples for the fold
     mytrain <- seq(N)[-folds[[iexp]]]
@@ -59,16 +65,22 @@ cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_opti
     # Predict on the test set
     ypred = predict(m, xtest, lambda=lambda)
     ytest = y[mytest,,drop=F]
-    # Assess performance
-    errfun = switch(type.measure,
-                    "mse"= function(u) {apply(((u-ytest)^2),2,mean)},
-                    "ci" = function(u) {apply(rbind(u,ytest), 2, function(v) { rcorr.cens(v[1:nrow(u)], v[-(1:nrow(u))], outx=FALSE)[[1]]})})
-    
-    return(sapply(ypred, errfun)) } , mc.cores=mc.cores)
+    return(evalpred(ypred, ytest, type.measure))
+  }, mc.cores = mc.cores)
   
   meanCV = Reduce("+", resCV) / length(resCV)
-  matplot(t(meanCV),type="l",lwd=2)
+  # 
   bestlambda=lambda[apply(meanCV,1,which.min)]
-  return(meanCV,bestlambda)
+  
+  ### Train model on full data
+  res <- kmr(x, y, kx_type, kx_option, kt_type, kt_option)
+  
+  res[['meanCV']] <- meanCV
+  res[['bestlambda']] <- bestlambda
+  res[['lambda']] <- lambda
+  res[['type.measure']] <- type.measure
+  
+  class(res) <- "cv.kmr"
+  return(res)
 }
   
