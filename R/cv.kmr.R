@@ -2,17 +2,17 @@
 #' 
 #' Does a k-fold cross-validation for \code{kmr}, and returns performance and optimal values for the regularization parameter \code{lambda}.
 #' 
-#' @param x \code{x} matrix as in \code{kmr}
-#' @param y Reponse matrix \code{y} as in \code{kmr}
-#' @param kx_type Kernel type for observations as in \code{kmr}
-#' @param kx_option Optional list of parameters for the observation kernel as in \code{kmr}
-#' @param kt_type Kernel type for tasks as in \code{kmr}
-#' @param kt_option Optional list of parameters for the task kernel as in \code{kmr}
-#' @param lambda Sequence of values for lambda that must be tested. Default is 10^(-5:5)
+#' @param x \code{x} matrix as in \code{kmr}.
+#' @param y Reponse matrix \code{y} as in \code{kmr}.
+#' @param kx_type Kernel type for observations as in \code{kmr}.
+#' @param kx_option Optional list of parameters for the observation kernel as in \code{kmr}.
+#' @param kt_type Kernel type for tasks as in \code{kmr}.
+#' @param kt_option Optional list of parameters for the task kernel as in \code{kmr}.
+#' @param lambda Sequence of values for lambda that must be tested. Default is 10^(-5:5).
 #' @param type.measure Loss to use for cross-validation. The default is \code{type.measure="ci"} the concordance index. Other options are \code{type.measure="mse"} the mean squared error.
-#' @param nfolds Number of folds for cross-validation. Default is 5.
-#' @param nrepeats Number of times the k-fold cross-validation is performed Default is 10.
-#' @param seed A seed number for the random number generator (useful to have the same CV splits)
+#' @param nfolds Number of folds for cross-validation. Default is 3.
+#' @param nrepeats Number of times the k-fold cross-validation is performed Default is 1.
+#' @param seed A seed number for the random number generator (useful to have the same CV splits).
 #' @return An object of class \code{"cv.kmr"}, which can then be used to make predictions for the different tasks on new observations as being a list containing the following useful slots:
 #' \item{meanCV}{A matrix of CV performance scores of dim ntask x nlambda.}
 #' \item{bestlambda}{A vector of lambdas of length ntask, each corresp to the underlying min CV score.}
@@ -21,7 +21,7 @@
 #' @export
 #' 
 #' 
-cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=list(sigma=1), kt_type=c("multitask", "empirical", "precomputed"), kt_option=list(alpha=1), lambda=10^(-5:5), type.measure = c("ci","mse"), nfolds=5, nrepeats=1, seed=9182456, mc.cores=1) {
+cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=list(sigma=1), kt_type=c("multitask", "empirical", "precomputed"), kt_option=list(alpha=1), lambda=10^(-5:5), type.measure = c("ci","mse"), nfolds=3, nrepeats=1, seed=9182456, mc.cores=1) {
   
   kx_type=match.arg(kx_type)
   kt_type=match.arg(kt_type)
@@ -30,6 +30,9 @@ cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_opti
   Nt = ncol(y)
   Nl = length(lambda)
   stopifnot(Nl > 1)
+  
+  x <- as.matrix(x)
+  y <- as.matrix(y)
   
   # Set random number generator seed
   set.seed(seed)
@@ -69,7 +72,6 @@ cv.kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_opti
   }, mc.cores = mc.cores)
   
   meanCV = Reduce("+", resCV) / length(resCV)
-  # 
   bestlambda=lambda[apply(meanCV,1,which.min)]
   
   ### Train model on full data

@@ -41,6 +41,9 @@ kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=
   kx_type=match.arg(kx_type)
   kt_type=match.arg(kt_type)
   
+  x <- as.matrix(x)
+  y <- as.matrix(y)
+  
   # Eigenvectors and eigenvalues of the covariate kernel
   Kx = switch( kx_type, 
                "linear" = x %*% t(x),
