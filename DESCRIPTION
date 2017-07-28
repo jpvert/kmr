@@ -3,7 +3,7 @@ Title: Kernel multitask regression
 Version: 0.0.1
 Authors@R: person("Jean-Philippe", "Vert", email = "djipay@gmail.com", role = c("aut", "cre"))
 Description: The package implements a kernel multitask regression algorithm to solve simultaneously several regression problems.
-Depends: R (>= 3.3.0), parallel
+Depends: R (>= 3.2), parallel
 Imports: Hmisc
 License: Artistic-2.0
 Encoding: UTF-8
