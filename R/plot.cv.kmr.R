@@ -8,6 +8,6 @@ plot.cv.kmr <- function(x) {
   
   cvobj = x
   matplot(log(cvobj$lambda), t(cvobj$meanCV), type = "l", lwd = 2, xlab = "log(lambda)", ylab = cvobj$type.measure)
-  points(log(cvobj$bestlambda), apply(cvobj$meanCV,1,min), lwd = 2)
+  points(log(cvobj$bestlambda), cvobj$bestCV, lwd = 2)
   invisible()
 }

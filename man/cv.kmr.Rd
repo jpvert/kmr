@@ -7,7 +7,7 @@
 cv.kmr(x, y, kx_type = c("linear", "gaussian", "precomputed"),
   kx_option = list(sigma = 1), kt_type = c("multitask", "empirical",
   "precomputed"), kt_option = list(alpha = 1), lambda = 10^(-5:5),
-  type.measure = c("ci", "mse"), nfolds = 3, nrepeats = 1,
+  type.measure = c("ci", "mse"), nfolds = 5, nrepeats = 1,
   seed = 9182456, mc.cores = 1)
 }
 \arguments{
@@ -27,7 +27,7 @@ cv.kmr(x, y, kx_type = c("linear", "gaussian", "precomputed"),
 
 \item{type.measure}{Loss to use for cross-validation. The default is \code{type.measure="ci"} the concordance index. Other options are \code{type.measure="mse"} the mean squared error.}
 
-\item{nfolds}{Number of folds for cross-validation. Default is 3.}
+\item{nfolds}{Number of folds for cross-validation. Default is 5.}
 
 \item{nrepeats}{Number of times the k-fold cross-validation is performed Default is 1.}
 
