@@ -1,15 +1,22 @@
 Package: kmr
 Title: Kernel multitask regression
-Version: 0.0.1
-Authors@R: person("Jean-Philippe", "Vert", email = "djipay@gmail.com", role = c("aut", "cre"))
+Version: 0.1
+Authors@R: c(
+  person("Jean-Philippe", "Vert", email = "djipay@gmail.com", role = c("aut", "cre")),
+  person("Yunlong", "Jiao", email = "yunlong.jiao@mines-paristech.fr", role = "aut"))
 Description: The package implements a kernel multitask regression algorithm to solve simultaneously several regression problems.
-Depends: R (>= 3.2), parallel
-Imports: Hmisc
+Depends:
+  R (>= 3.2),
+Imports:
+  parallel,
+Suggests:
+  Hmisc,
+  knitr,
+  rmarkdown,
 License: Artistic-2.0
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/jpvert/kmr
 BugReports: https://github.com/jpvert/kmr/issues
 RoxygenNote: 6.0.1
-Suggests: knitr, rmarkdown
 VignetteBuilder: knitr

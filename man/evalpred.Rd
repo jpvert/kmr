@@ -4,14 +4,14 @@
 \alias{evalpred}
 \title{Evaluate KMR}
 \usage{
-evalpred(ypred, ytest, type.measure = c("ci", "mse"))
+evalpred(ypred, ytest, type.measure = c("ci", "mse", "cor"))
 }
 \arguments{
 \item{ypred}{Matrix or list of matrices (eg. each corresp to a lambda) of predicted reponses of cell lines x tasks.}
 
 \item{ytest}{Matrix of true responses of cell lines x tasks.}
 
-\item{type.measure}{Measure type of evaluation. The default is \code{type.measure="ci"} the concordance index. Other options are \code{type.measure="mse"} the mean squared error.}
+\item{type.measure}{Character indicating the measure type of evaluation. Possible options are \code{"ci"} (concordance index, default), \code{"mse"} (mean squared error), \code{"cor"} (pearson correlation).}
 }
 \description{
 Evaluate prediction performance of KMR.

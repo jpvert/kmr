@@ -1,6 +1,6 @@
 #' Kernel multitask regression
 #' 
-#' Trains a kernel multitask regression model
+#' Fits a kernel multitask regression (KMR) model.
 #' 
 #' @param x Input matrix of covariates, of dimension \code{nobs x nvars}; each 
 #'   row is an observation vector. If a precomputed kernel is used, then 
@@ -24,19 +24,29 @@
 #'   as kernel between the tasks. \code{kt_type="precomputed"} allows to provide
 #'   a precomputed kernel as a field \code{kt} in the \code{kt_type} list.
 #' @param kt_option. An optional list of parameters for the task kernel.
-#' @param lambda. If cross-validation is performed, a vector of values of lambda that must be tested
-#' @param nfolds Number of folds for cross-validation. If \code{nfolds=1}
-#'   (default), then no cross-validation is done, except if \code{foldid} is
-#'   provided.
-#' @param foldid An optional vector of values between 1 and \code{nfold}
-#'   identifying what fold each observation is in. If supplied, \code{nfold} can
-#'   be missing.
-#'   
+#' 
 #' @return An object of class \code{"kmr"}, which can then be used to make 
-#'   predictions for the different tasks on new observations.
+#'   predictions for the different tasks on new observations, as a list containing the following slots:
+#' \item{...}{Outputs of a CV-fitted KMR model as in \code{"kmr"}.}
 #' @export
-kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=list(sigma=1), kt_type=c("multitask", "empirical", "precomputed"), kt_option=list(alpha=1)) {
+#' @references 
+#' Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{http://www.biorxiv.org/content/early/2017/08/01/171298}{bioRxiv-171298}.
+#' @examples 
+#' # setup
+#' nx <- 100
+#' nt <- 50
+#' p <- 20
+#' tridx <- 1:80
+#' tstidx <- 81:100
+#' 
 
+kmr <- function(x, 
+                y, 
+                kx_type=c("linear", "gaussian", "precomputed"), 
+                kx_option=list(sigma=1), 
+                kt_type=c("multitask", "empirical", "precomputed"), 
+                kt_option=list(alpha=0.5))
+{
   this.fcall=match.call()
   kx_type=match.arg(kx_type)
   kt_type=match.arg(kt_type)
@@ -69,7 +79,7 @@ kmr <- function(x, y, kx_type=c("linear", "gaussian", "precomputed"), kx_option=
   
   # Useful computation: gamma
   gamma = as.matrix(apply(Ux,2,sum))
-
+  
   # Return
   res=list(x=x,y=y,Ux=Ux,Dx=Dx,Ut=Ut,Dt=Dt,gamma=gamma,Kt=Kt,kx_type=kx_type,kx_option=kx_option,call=this.fcall)
   
