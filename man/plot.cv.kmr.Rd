@@ -2,13 +2,22 @@
 % Please edit documentation in R/plot.cv.kmr.R
 \name{plot.cv.kmr}
 \alias{plot.cv.kmr}
-\title{Plot method for a "\code{cv.kmr}" object}
+\title{Plot the cross-validation curve produced by "\code{cv.kmr}"}
 \usage{
-\method{plot}{cv.kmr}(x)
+\method{plot}{cv.kmr}(x, ...)
 }
 \arguments{
-\item{x}{Fitted "\code{cv.kmr}" model object}
+\item{x}{Fitted "\code{cv.kmr}" model object.}
+
+\item{...}{Other graphical parameters to \code{matplot}.}
+}
+\value{
+A plot is produced, and nothing returned.
 }
 \description{
-Similar to other \code{plot} methods, this function plots pred perf over regularization parameter for a "\code{cv.kmr}" model object.
+Plots the cross-validation curve as a function of \code{lambda} values tested, 
+as well as the optimal \code{lambda} selected by cross-validation for each task.
+}
+\seealso{
+\code{\link{cv.kmr}}
 }

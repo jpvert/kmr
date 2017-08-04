@@ -2,17 +2,28 @@
 % Please edit documentation in R/evalpred.R
 \name{evalpred}
 \alias{evalpred}
-\title{Evaluate KMR}
+\title{Evaluate prediction performance}
 \usage{
 evalpred(ypred, ytest, type.measure = c("ci", "mse", "cor"))
 }
 \arguments{
-\item{ypred}{Matrix or list of matrices (eg. each corresp to a lambda) of predicted reponses of cell lines x tasks.}
+\item{ypred}{Matrix or list of matrices (e.g. each corresponding to a tested lambda)
+of predicted reponses, of dimension \code{nobs x ntask}.}
 
-\item{ytest}{Matrix of true responses of cell lines x tasks.}
+\item{ytest}{Matrix of true reponses, of dimension \code{nobs x ntask}.}
 
-\item{type.measure}{Character indicating the measure type of evaluation. Possible options are \code{"ci"} (concordance index, default), \code{"mse"} (mean squared error), \code{"cor"} (pearson correlation).}
+\item{type.measure}{Measure type for evaluating performance. Possible options are 
+"\code{ci}" (concordance index), "\code{mse}" (mean squared error), 
+"\code{cor}" (pearson correlation). Default is "\code{ci}".}
+}
+\value{
+A matrix of mean performance scores (averaged over observations),
+  of dimension \code{ntask x nlambda} where \code{nlambda} denotes the length of the list \code{ypred}.
 }
 \description{
-Evaluate prediction performance of KMR.
+Computes performance scores of predicted against true responses.
+}
+\note{
+\code{ypred} and \code{ytest} are not interchangably equivalent for \code{type.measure="ci"},
+  as \code{ytest} is treated as true responses and used to determine denominator in computing C-index.
 }

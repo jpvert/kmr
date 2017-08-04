@@ -6,7 +6,7 @@
 \usage{
 kmr(x, y, kx_type = c("linear", "gaussian", "precomputed"),
   kx_option = list(sigma = 1), kt_type = c("multitask", "empirical",
-  "precomputed"), kt_option = list(alpha = 1))
+  "precomputed"), kt_option = list(alpha = 1, kt = NULL))
 }
 \arguments{
 \item{x}{Input matrix of covariates, of dimension \code{nobs x nvars}; each 
@@ -24,7 +24,8 @@ passed as an element of the \code{kx_option} list.
 \code{kx_type="precomputed"} assumes that the \code{x} matrix provided is
 the kernel Gram matrix.}
 
-\item{kx_option}{An optional list of parameters for the observation kernel.}
+\item{kx_option}{An optional list of parameters for the observation kernel,
+including elements such as "\code{sigma}".}
 
 \item{kt_type}{Kernel for tasks. \code{kt_type="multitask"} (default) is the 
 multitask kernel with parameter \eqn{0 \le \alpha \le 1}, which 
@@ -35,22 +36,49 @@ to the \code{kt_option} list as a field \code{alpha}.
 as kernel between the tasks. \code{kt_type="precomputed"} allows to provide
 a precomputed kernel as a field \code{kt} in the \code{kt_type} list.}
 
-\item{kt_option.}{An optional list of parameters for the task kernel.}
-
-\item{lambda.}{If cross-validation is performed, a vector of values of lambda that must be tested}
-
-\item{nfolds}{Number of folds for cross-validation. If \code{nfolds=1}
-(default), then no cross-validation is done, except if \code{foldid} is
-provided.}
-
-\item{foldid}{An optional vector of values between 1 and \code{nfold}
-identifying what fold each observation is in. If supplied, \code{nfold} can
-be missing.}
+\item{kt_option}{An optional list of parameters for the task kernel, 
+including elements such as "\code{alpha}" and "\code{kt}".}
 }
 \value{
-An object of class \code{"kmr"}, which can then be used to make 
+An object (list) of class \code{"kmr"}, which can then be used to make 
   predictions for the different tasks on new observations.
 }
 \description{
-Trains a kernel multitask regression model
+Fits a kernel multitask regression (KMR) model.
+}
+\examples{
+# Data
+ntr <- 80
+ntst <- 20
+nt <- 50
+p <- 20
+xtrain <- matrix(rnorm(ntr*p),ntr,p)
+xtest <- matrix(rnorm(ntst*p),ntst,p)
+ytrain <- matrix(rnorm(ntr*nt),ntr,nt)
+ytest <- matrix(rnorm(ntst*nt),ntst,nt)
+
+# Case I: with linear kernel for x and empirical kernel for t
+# Train
+mo1 <- kmr(x=xtrain, y=ytrain, kx_type="linear", kt_type="empirical")
+# Predict
+pred1 <- predict(mo1, xtest)
+# Evaluate
+evalpred(pred1, ytest, "mse")
+
+# Case II: with precomputed kernel matrices
+# Kernel matrices
+kxtrain <- tcrossprod(xtrain)
+kxtest <- tcrossprod(xtest,xtrain)
+kttrain <- cor(ytrain)
+# Train
+mo2 <- kmr(x=kxtrain, y=ytrain, kx_type="precomputed", 
+           kt_type="precomputed", kt_option=list(kt=kttrain))
+# Predict
+pred2 <- predict(mo2, kxtest)
+# Evaluate
+evalpred(pred2, ytest, "mse")
+
+}
+\references{
+Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{http://www.biorxiv.org/content/early/2017/08/01/171298}{bioRxiv-171298}.
 }

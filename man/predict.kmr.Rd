@@ -4,16 +4,18 @@
 \alias{predict.kmr}
 \title{Make prediction with a "\code{kmr}" object}
 \usage{
-\method{predict}{kmr}(object, newx, lambda = 1)
+\method{predict}{kmr}(object, newx, lambda = 1, ...)
 }
 \arguments{
-\item{object}{Fitted "\code{kmr}" model object}
+\item{object}{Fitted "\code{kmr}" model object.}
 
-\item{newx}{Matrix of new values for \code{x} at which predictions are to be 
-made.}
+\item{newx}{Matrix of new values for \code{x} or kernel matrix for new values
+crossing old values for \code{x}, at which predictions are to be made.}
 
 \item{lambda}{Value(s) of the regularization parameter, a single scalar or a
 sequence of values. Default is 1.}
+
+\item{...}{Not used. Other arguments to predict.}
 }
 \value{
 A matrix of predicted values for the new samples (in rows) and all
@@ -24,5 +26,8 @@ A matrix of predicted values for the new samples (in rows) and all
 }
 \description{
 Similar to other \code{predict} methods, this function predicts fitted values
-from a fitted "\code{kmr}" object
+from a fitted "\code{kmr}" object.
+}
+\seealso{
+\code{\link{kmr}}
 }

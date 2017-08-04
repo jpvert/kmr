@@ -8,54 +8,66 @@
 #' @param kx_option Optional list of parameters for the observation kernel as in \code{kmr}.
 #' @param kt_type Kernel type for tasks as in \code{kmr}.
 #' @param kt_option Optional list of parameters for the task kernel as in \code{kmr}.
-#' @param lambda Vector of (more than one) values for lambda that must be tested. Default is 10^(-5:5).
-#' @param type.measure Character indicating the measure type of evaluation. Possible options are \code{"ci"} (concordance index, default), \code{"mse"} (mean squared error), \code{"cor"} (pearson correlation).
+#' @param lambda Sequence of (more than one) values for lambda that must be tested. Default is 10^(-5:5).
+#' @param type.measure Measure type for evaluating performance. Possible options are 
+#'   "\code{ci}" (concordance index), "\code{mse}" (mean squared error), 
+#'   "\code{cor}" (pearson correlation). Default is "\code{ci}".
 #' @param nfolds Number of folds for cross-validation. Default is 5.
 #' @param nrepeats Number of times the k-fold cross-validation is performed Default is 1.
 #' @param seed A seed number for the random number generator (useful to have the same CV splits).
-#' @return An object of class \code{"cv.kmr"}, which can then be used to make predictions for the different tasks on new observations, as a list containing the following slots:
+#' @param mc.cores Number of parallelable CPU cores to use.
+#' 
+#' @return An object (list) of class \code{"cv.kmr"}, which can then be used to make predictions for the different tasks on new observations, as a list containing the following slots:
 #' \item{...}{Outputs of a CV-fitted KMR model as in \code{"kmr"}.}
 #' \item{meanCV}{A matrix of CV performance scores of dim ntask x nlambda.}
 #' \item{bestlambda}{A vector of lambdas of length ntask, each corresp to the underlying min CV score.}
 #' \item{bestCV}{A vector of min CV performance scores of length ntask.}
 #' \item{lambda}{Lambda sequence against which a model is tested.}
-#' \item{type.measure}{Measure type.}
+#' \item{type.measure}{Measure type for evaluating performance.}
+#' 
 #' @importFrom parallel mclapply
+#' 
 #' @export
+#' 
 #' @references 
 #' Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{http://www.biorxiv.org/content/early/2017/08/01/171298}{bioRxiv-171298}.
+#' 
+#' @seealso \code{\link{kmr}}
+#' 
 #' @examples 
-#' # setup
-#' nx <- 100
+#' # Data
+#' ntr <- 80
+#' ntst <- 20
 #' nt <- 50
 #' p <- 20
-#' tridx <- 1:80
-#' tstidx <- 81:100
+#' xtrain <- matrix(rnorm(ntr*p),ntr,p)
+#' xtest <- matrix(rnorm(ntst*p),ntst,p)
+#' ytrain <- matrix(rnorm(ntr*nt),ntr,nt)
+#' ytest <- matrix(rnorm(ntst*nt),ntst,nt)
 #' 
-#' # kernel matrices
-#' x <- tcrossprod(matrix(rnorm(nx*p),nx,p))
-#' t <- tcrossprod(matrix(rnorm(nt*p),nt,p))
-#' y <- matrix(rnorm(nx*nt),nx,nt)
-#' 
-#' # train
-#' model <- cv.kmr(x=x[tridx,tridx], y=y[tridx, ], kx_type="precomputed", kt_type="precomputed", kt_option=list(kt=t), type.measure="mse")
-#' # predict
-#' pred <- predict(model, x[tstidx, tridx])
+#' # Train with Gaussian RBF kernel for x and multitask kernel for t
+#' cvmo <- cv.kmr(x=xtrain, y=ytrain, kx_type="gaussian", kx_option=list(sigma=100), 
+#'                kt_type="multitask", kt_option=list(alpha=0.5), type.measure="mse")
+#' # Plot
+#' plot(cvmo)
+#' # Predict
+#' cvpred <- predict(cvmo, xtest)
+#' # Evaluate
+#' evalpred(cvpred, ytest, "mse")
 #' 
 
 cv.kmr <- function(x, 
                    y, 
                    kx_type = c("linear", "gaussian", "precomputed"), 
-                   kx_option = list(sigma=1), 
+                   kx_option = list(sigma = 1), 
                    kt_type = c("multitask", "empirical", "precomputed"), 
-                   kt_option = list(alpha=0.5), 
+                   kt_option = list(alpha = 1, kt = NULL), 
                    lambda = 10^(-5:5), 
-                   type.measure = c("ci","mse","cor"), 
+                   type.measure = c("ci", "mse", "cor"), 
                    nfolds = 5, 
                    nrepeats = 1, 
                    seed = 9182456, 
-                   mc.cores = 1, 
-                   ...)
+                   mc.cores = 1)
 {
   kx_type <- match.arg(kx_type)
   kt_type <- match.arg(kt_type)
@@ -100,7 +112,7 @@ cv.kmr <- function(x,
     # Train on the training set
     m <- kmr(xtrain, y[mytrain,,drop=F], kx_type, kx_option, kt_type, kt_option)
     # Predict on the test set
-    ypred <- predict(m, xtest, lambda=lambda)
+    ypred <- predict.kmr(m, xtest, lambda=lambda)
     ytest <- y[mytest,,drop=F]
     return(evalpred(ypred, ytest, type.measure))
   }, mc.cores = mc.cores)
@@ -115,7 +127,7 @@ cv.kmr <- function(x,
   bestCV <- meanCV[cbind(seq_along(ilambda),ilambda)]
   
   ### Train model on full data
-  res <- kmr(x, y, kx_type, kx_option, kt_type, kt_option, ...)
+  res <- kmr(x, y, kx_type, kx_option, kt_type, kt_option)
   
   res[['meanCV']] <- meanCV
   res[['bestlambda']] <- bestlambda

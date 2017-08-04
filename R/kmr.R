@@ -14,7 +14,8 @@
 #'   passed as an element of the \code{kx_option} list.
 #'   \code{kx_type="precomputed"} assumes that the \code{x} matrix provided is
 #'   the kernel Gram matrix.
-#' @param kx_option An optional list of parameters for the observation kernel.
+#' @param kx_option An optional list of parameters for the observation kernel,
+#'   including elements such as "\code{sigma}".
 #' @param kt_type Kernel for tasks. \code{kt_type="multitask"} (default) is the 
 #'   multitask kernel with parameter \eqn{0 \le \alpha \le 1}, which 
 #'   interpolates between the Dirac kernel for \eqn{\alpha=1} (default) and the 
@@ -23,66 +24,92 @@
 #'   \code{kt_type="empirical"} takes the empirical correlation between outputs 
 #'   as kernel between the tasks. \code{kt_type="precomputed"} allows to provide
 #'   a precomputed kernel as a field \code{kt} in the \code{kt_type} list.
-#' @param kt_option. An optional list of parameters for the task kernel.
+#' @param kt_option An optional list of parameters for the task kernel, 
+#'   including elements such as "\code{alpha}" and "\code{kt}".
 #' 
-#' @return An object of class \code{"kmr"}, which can then be used to make 
-#'   predictions for the different tasks on new observations, as a list containing the following slots:
-#' \item{...}{Outputs of a CV-fitted KMR model as in \code{"kmr"}.}
+#' @return An object (list) of class \code{"kmr"}, which can then be used to make 
+#'   predictions for the different tasks on new observations.
+#' 
 #' @export
+#' 
 #' @references 
 #' Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{http://www.biorxiv.org/content/early/2017/08/01/171298}{bioRxiv-171298}.
+#' 
 #' @examples 
-#' # setup
-#' nx <- 100
+#' # Data
+#' ntr <- 80
+#' ntst <- 20
 #' nt <- 50
 #' p <- 20
-#' tridx <- 1:80
-#' tstidx <- 81:100
+#' xtrain <- matrix(rnorm(ntr*p),ntr,p)
+#' xtest <- matrix(rnorm(ntst*p),ntst,p)
+#' ytrain <- matrix(rnorm(ntr*nt),ntr,nt)
+#' ytest <- matrix(rnorm(ntst*nt),ntst,nt)
+#' 
+#' # Case I: with linear kernel for x and empirical kernel for t
+#' # Train
+#' mo1 <- kmr(x=xtrain, y=ytrain, kx_type="linear", kt_type="empirical")
+#' # Predict
+#' pred1 <- predict(mo1, xtest)
+#' # Evaluate
+#' evalpred(pred1, ytest, "mse")
+#' 
+#' # Case II: with precomputed kernel matrices
+#' # Kernel matrices
+#' kxtrain <- tcrossprod(xtrain)
+#' kxtest <- tcrossprod(xtest,xtrain)
+#' kttrain <- cor(ytrain)
+#' # Train
+#' mo2 <- kmr(x=kxtrain, y=ytrain, kx_type="precomputed", 
+#'            kt_type="precomputed", kt_option=list(kt=kttrain))
+#' # Predict
+#' pred2 <- predict(mo2, kxtest)
+#' # Evaluate
+#' evalpred(pred2, ytest, "mse")
 #' 
 
 kmr <- function(x, 
                 y, 
-                kx_type=c("linear", "gaussian", "precomputed"), 
-                kx_option=list(sigma=1), 
-                kt_type=c("multitask", "empirical", "precomputed"), 
-                kt_option=list(alpha=0.5))
+                kx_type = c("linear", "gaussian", "precomputed"), 
+                kx_option = list(sigma = 1), 
+                kt_type = c("multitask", "empirical", "precomputed"), 
+                kt_option = list(alpha = 1, kt = NULL))
 {
-  this.fcall=match.call()
-  kx_type=match.arg(kx_type)
-  kt_type=match.arg(kt_type)
+  this.fcall <- match.call()
+  kx_type <- match.arg(kx_type)
+  kt_type <- match.arg(kt_type)
   
   x <- as.matrix(x)
   y <- as.matrix(y)
   
   # Eigenvectors and eigenvalues of the covariate kernel
-  Kx = switch( kx_type, 
-               "linear" = x %*% t(x),
-               "gaussian" = gausskernel(x, kx_option[['sigma']]),
-               "precomputed" = x)
+  Kx = switch(kx_type, 
+              "linear" = x %*% t(x),
+              "gaussian" = gausskernel(x, kx_option[['sigma']]),
+              "precomputed" = x)
   
-  s=eigen(Kx,symmetric=TRUE)
-  Ux=s$vectors
-  Dx=s$values
+  s <- eigen(Kx,symmetric=TRUE)
+  Ux <- s$vectors
+  Dx <- s$values
   rm(s)
   
   # Eigenvectors and eigenvalues of the task kernel
-  ntasks=ncol(y)
+  ntasks <- ncol(y)
   Kt = switch(kt_type,
-              multitask=kt_option[['alpha']]*diag(ntasks)+matrix(1-kt_option[['alpha']],nrow=ntasks,ncol=ntasks),
-              empirical=cor(y),
-              precomputed=kt_option[['kt']]
-              )
-  s=eigen(Kt,symmetric = TRUE)
-  Ut=s$vectors
-  Dt=s$values
+              "multitask"=kt_option[['alpha']]*diag(ntasks)+matrix(1-kt_option[['alpha']],nrow=ntasks,ncol=ntasks),
+              "empirical"=cor(y),
+              "precomputed"=kt_option[['kt']])
+  s <- eigen(Kt,symmetric = TRUE)
+  Ut <- s$vectors
+  Dt <- s$values
   rm(s)
   
   # Useful computation: gamma
-  gamma = as.matrix(apply(Ux,2,sum))
+  gamma <- as.matrix(apply(Ux,2,sum))
   
   # Return
-  res=list(x=x,y=y,Ux=Ux,Dx=Dx,Ut=Ut,Dt=Dt,gamma=gamma,Kt=Kt,kx_type=kx_type,kx_option=kx_option,call=this.fcall)
+  res <- list(x=x,y=y,Ux=Ux,Dx=Dx,Ut=Ut,Dt=Dt,gamma=gamma,Kt=Kt,kx_type=kx_type,kx_option=kx_option,call=this.fcall)
   
-  class(res)="kmr"
+  class(res) <- "kmr"
   return(res)
 }

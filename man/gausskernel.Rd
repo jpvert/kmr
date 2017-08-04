@@ -7,17 +7,17 @@
 gausskernel(x, sigma = 1, x2)
 }
 \arguments{
-\item{x}{Input matrix of covariates}
+\item{x}{Input matrix of covariates with samples in rows.}
 
-\item{sigma}{Bandwidth of the Gaussian RBF kernel (default=1)}
+\item{sigma}{Bandwidth of the Gaussian RBF kernel. Default is 1.}
 
-\item{x2}{(optional) A second matrix of covariates}
+\item{x2}{(Optional) a second matrix of covariates with samples in rows.}
 }
 \value{
-If \code{x2} is provided, returns the kernel matrix between samples
-  in x and samples in x2. If \code{x2} is not provided, returns the kernel
-  Gram matrix of x versus itself.
+If \code{x2} is provided, returns the kernel matrix crossing samples
+  in \code{x} and samples in \code{x2}. If \code{x2} is not provided, returns the kernel
+  Gram matrix of \code{x} versus itself.
 }
 \description{
-Compute the Gaussian RBF kernel
+Computes the Gaussian RBF kernel k(x,x') = exp(-|x-x'|^2/(2*sigma^2)).
 }

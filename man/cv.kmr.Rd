@@ -6,14 +6,14 @@
 \usage{
 cv.kmr(x, y, kx_type = c("linear", "gaussian", "precomputed"),
   kx_option = list(sigma = 1), kt_type = c("multitask", "empirical",
-  "precomputed"), kt_option = list(alpha = 1), lambda = 10^(-5:5),
-  type.measure = c("ci", "mse", "cor"), nfolds = 5, nrepeats = 1,
-  seed = 9182456, mc.cores = 1)
+  "precomputed"), kt_option = list(alpha = 1, kt = NULL),
+  lambda = 10^(-5:5), type.measure = c("ci", "mse", "cor"), nfolds = 5,
+  nrepeats = 1, seed = 9182456, mc.cores = 1)
 }
 \arguments{
-\item{x}{\code{x} matrix as in \code{kmr}.}
+\item{x}{\code{x} input matrix as in \code{kmr}.}
 
-\item{y}{Reponse matrix \code{y} as in \code{kmr}.}
+\item{y}{\code{y} output matrix as in \code{kmr}.}
 
 \item{kx_type}{Kernel type for observations as in \code{kmr}.}
 
@@ -23,24 +23,57 @@ cv.kmr(x, y, kx_type = c("linear", "gaussian", "precomputed"),
 
 \item{kt_option}{Optional list of parameters for the task kernel as in \code{kmr}.}
 
-\item{lambda}{Sequence of values for lambda that must be tested. Default is 10^(-5:5).}
+\item{lambda}{Sequence of (more than one) values for lambda that must be tested. Default is 10^(-5:5).}
 
-\item{type.measure}{Character indicating the measure type of evaluation. Possible options are \code{"ci"} (concordance index, default), \code{"mse"} (mean squared error), \code{"cor"} (pearson correlation).}
+\item{type.measure}{Measure type for evaluating performance. Possible options are 
+"\code{ci}" (concordance index), "\code{mse}" (mean squared error), 
+"\code{cor}" (pearson correlation). Default is "\code{ci}".}
 
 \item{nfolds}{Number of folds for cross-validation. Default is 5.}
 
 \item{nrepeats}{Number of times the k-fold cross-validation is performed Default is 1.}
 
 \item{seed}{A seed number for the random number generator (useful to have the same CV splits).}
+
+\item{mc.cores}{Number of parallelable CPU cores to use.}
 }
 \value{
-An object of class \code{"cv.kmr"}, which can then be used to make predictions for the different tasks on new observations as being a list containing the following useful slots:
+An object (list) of class \code{"cv.kmr"}, which can then be used to make predictions for the different tasks on new observations, as a list containing the following slots:
+\item{...}{Outputs of a CV-fitted KMR model as in \code{"kmr"}.}
 \item{meanCV}{A matrix of CV performance scores of dim ntask x nlambda.}
 \item{bestlambda}{A vector of lambdas of length ntask, each corresp to the underlying min CV score.}
 \item{bestCV}{A vector of min CV performance scores of length ntask.}
-\item{lambda}{Lambda grid to tune over.}
-\item{type.measure}{Measure type.}
+\item{lambda}{Lambda sequence against which a model is tested.}
+\item{type.measure}{Measure type for evaluating performance.}
 }
 \description{
-Does a k-fold cross-validation for \code{kmr}, and returns performance and optimal values for the regularization parameter \code{lambda}.
+Does a k-fold cross-validation for \code{kmr}, and returns a fitted KMR model, CV performance scores and optimal values for the regularization parameter \code{lambda}.
+}
+\examples{
+# Data
+ntr <- 80
+ntst <- 20
+nt <- 50
+p <- 20
+xtrain <- matrix(rnorm(ntr*p),ntr,p)
+xtest <- matrix(rnorm(ntst*p),ntst,p)
+ytrain <- matrix(rnorm(ntr*nt),ntr,nt)
+ytest <- matrix(rnorm(ntst*nt),ntst,nt)
+
+# Train with Gaussian RBF kernel for x and multitask kernel for t
+cvmo <- cv.kmr(x=xtrain, y=ytrain, kx_type="gaussian", kx_option=list(sigma=100), 
+               kt_type="multitask", kt_option=list(alpha=0.5), type.measure="mse")
+# Plot
+plot(cvmo)
+# Predict
+cvpred <- predict(cvmo, xtest)
+# Evaluate
+evalpred(cvpred, ytest, "mse")
+
+}
+\references{
+Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{http://www.biorxiv.org/content/early/2017/08/01/171298}{bioRxiv-171298}.
+}
+\seealso{
+\code{\link{kmr}}
 }
