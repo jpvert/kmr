@@ -7,10 +7,9 @@ Authors@R: c(
 Description: The package implements a kernel multitask regression algorithm to solve simultaneously several regression problems.
 Depends: R (>= 3.2)
 Imports: parallel, graphics, stats
-Suggests: Hmisc, knitr, rmarkdown
-License: Artistic-2.0
+Suggests: Hmisc
+License: GPL-3
 Encoding: UTF-8
-LazyData: true
 URL: https://github.com/jpvert/kmr
 BugReports: https://github.com/jpvert/kmr/issues
 RoxygenNote: 6.0.1

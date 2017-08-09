@@ -30,7 +30,7 @@
 #' @export
 #' 
 #' @references 
-#' Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{http://www.biorxiv.org/content/early/2017/08/01/171298}{bioRxiv-171298}.
+#' Bernard, E., Jiao, Y., Scornet, E., Stoven, V., Walter, T., and Vert, J.-P. (2017). Kernel multitask regression for toxicogenetics. \href{https://doi.org/10.1101/171298}{bioRxiv-171298}.
 #' 
 #' @seealso \code{\link{kmr}}
 #' 

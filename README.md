@@ -1,5 +1,9 @@
 # kmr
 
+Kernel multitask regression
+
+## Description
+
 `kmr` is an `R` package implementing a kernel multitask regression algorithm to solve simultaneously several regression problems.
 
 ## Installation
@@ -15,7 +19,7 @@ Refer to github repo [`kmr_toxicogenetics`](https://github.com/jpvert/kmr_toxico
 
 ## References
 
-> Elsa Bernard, Yunlong Jiao, Erwan Scornet, Veronique Stoven, Thomas Walter, and Jean-Philippe Vert. "Kernel multitask regression for toxicogenetics." Submitted. 2017. [bioRxiv-171298](http://www.biorxiv.org/content/early/2017/08/01/171298)
+> Elsa Bernard, Yunlong Jiao, Erwan Scornet, Veronique Stoven, Thomas Walter, and Jean-Philippe Vert. "Kernel multitask regression for toxicogenetics." Submitted. 2017. [bioRxiv-171298](https://doi.org/10.1101/171298)
 
 ## Misc
 
