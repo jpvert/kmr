@@ -13,7 +13,7 @@
 #'   "\code{ci}" (concordance index), "\code{mse}" (mean squared error), 
 #'   "\code{cor}" (pearson correlation). Default is "\code{ci}".
 #' @param nfolds Number of folds for cross-validation. Default is 5.
-#' @param nrepeats Number of times the k-fold cross-validation is performed Default is 1.
+#' @param nrepeats Number of times the k-fold cross-validation is performed. Default is 1.
 #' @param seed A seed number for the random number generator (useful to have the same CV splits).
 #' @param mc.cores Number of parallelable CPU cores to use.
 #' 
